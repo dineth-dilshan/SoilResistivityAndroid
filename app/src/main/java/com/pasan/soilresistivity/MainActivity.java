@@ -119,16 +119,7 @@ public class MainActivity extends Activity {
             rows.addView(tableRow(String.valueOf(i + 1), number.format(p.mnHalf), number.format(p.abHalf),
                     number.format(p.resistance), number.format(p.geometricFactor()), number.format(p.apparentResistivity()), i));
         }
-        if (model != null) {
-            csv.append("\nLayer,Resistivity (ohm-m),Thickness (m),Bottom depth (m)\n");
-            double depth = 0;
-            for (int i = 0; i < model.resistivity.length; i++) {
-                csv.append(i+1).append(',').append(model.resistivity[i]).append(',');
-                if (i < model.thickness.length) { depth += model.thickness[i]; csv.append(model.thickness[i]).append(',').append(depth); }
-                csv.append('\n');
-            }
-            csv.append("Fit error (%),").append(model.errorPercent).append('\n');
-        }
+        
         if (graph != null) graph.setData(points, model);
         refreshLayers();
     }
@@ -220,15 +211,57 @@ public class MainActivity extends Activity {
         } catch (Exception e) { toast("Export failed: " + e.getMessage()); }
     }
 
-    private void writeCsv(Uri uri) throws Exception {
-        StringBuilder csv = new StringBuilder("No,MN/2 (m),AB/2 (m),R (ohm),K (m),Apparent resistivity (ohm-m)\n");
-        for (int i = 0; i < points.size(); i++) {
-            SurveyPoint p = points.get(i);
-            csv.append(i+1).append(',').append(p.mnHalf).append(',').append(p.abHalf).append(',').append(p.resistance)
-                    .append(',').append(p.geometricFactor()).append(',').append(p.apparentResistivity()).append('\n');
-        }
-        try (OutputStream out = getContentResolver().openOutputStream(uri)) { out.write(csv.toString().getBytes(StandardCharsets.UTF_8)); }
+  private void writeCsv(Uri uri) throws Exception {
+    StringBuilder csv = new StringBuilder(
+        "No,MN/2 (m),AB/2 (m),R (ohm),K (m),Apparent resistivity (ohm-m)\n"
+    );
+
+    for (int i = 0; i < points.size(); i++) {
+        SurveyPoint p = points.get(i);
+
+        csv.append(i + 1).append(',')
+            .append(p.mnHalf).append(',')
+            .append(p.abHalf).append(',')
+            .append(p.resistance).append(',')
+            .append(p.geometricFactor()).append(',')
+            .append(p.apparentResistivity()).append('\n');
     }
+
+    if (model != null) {
+        csv.append(
+            "\nLayer,Resistivity (ohm-m),Thickness (m),Bottom depth (m)\n"
+        );
+
+        double depth = 0;
+
+        for (int i = 0; i < model.resistivity.length; i++) {
+            csv.append(i + 1).append(',')
+                .append(model.resistivity[i]).append(',');
+
+            if (i < model.thickness.length) {
+                depth += model.thickness[i];
+
+                csv.append(model.thickness[i])
+                    .append(',')
+                    .append(depth);
+            }
+
+            csv.append('\n');
+        }
+
+        csv.append("Fit error (%),")
+            .append(model.errorPercent)
+            .append('\n');
+    }
+
+    try (OutputStream out =
+             getContentResolver().openOutputStream(uri)) {
+
+        out.write(
+            csv.toString().getBytes(StandardCharsets.UTF_8)
+        );
+    }
+}
 
     private void writePdf(Uri uri) throws Exception {
         PdfDocument pdf = new PdfDocument(); Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
