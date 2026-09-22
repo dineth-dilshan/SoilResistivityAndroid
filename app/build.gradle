@@ -8,8 +8,9 @@ android {
         applicationId 'com.pasan.soilresistivity'
         minSdk 24
         targetSdk 35
-        versionCode 1
-        versionName '1.0.0'
+        def cloudBuild = System.getenv('GITHUB_RUN_NUMBER') ?: '1'
+        versionCode cloudBuild.toInteger()
+        versionName "1.1.${cloudBuild}"
     }
 
     buildTypes {

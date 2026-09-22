@@ -11,6 +11,9 @@ An offline Android application for entering Wenner (alpha) field measurements an
 - Black measured points, red fitted curve, and blue layer step model
 - Layer resistivity, thickness, cumulative depth, and fit error
 - Save and reopen the most recent survey on the phone
+- Automatic draft recovery after pressing Home or after Android closes the app
+- Tap any reading row to edit it, then return automatically to `MN/2`
+- Survey History with reopen, edit, export, and delete functions
 - Built-in sample dataset from the supplied field sheet
 - PDF report export
 - Excel-compatible CSV export
@@ -35,6 +38,27 @@ Distances are entered in metres and resistance in ohms, producing apparent resis
 7. Android Studio places it under `app/build/outputs/apk/debug/app-debug.apk`.
 
 The project uses Java 17, Android API 35, and supports Android 7.0 and newer.
+
+## Change the app icon later
+
+The default icon is `app/src/main/res/drawable/app_icon.xml`. To use your own icon:
+
+1. Prepare a square PNG, preferably 1024 × 1024.
+2. Rename it `app_icon.png`.
+3. Delete `app_icon.xml` from the same GitHub folder.
+4. Upload `app_icon.png` to `app/src/main/res/drawable/` and commit it.
+5. GitHub Actions will build a new APK with the replacement icon.
+
+The workflow caches one debug signing key and uses an increasing GitHub run number as the Android version code. After installing the first APK produced by this updated workflow, future APKs should install as updates without clearing saved survey history.
+
+## Build the APK on GitHub (no Android Studio)
+
+1. Create a new GitHub repository and keep it private.
+2. Upload the **contents** of this `SoilResistivityApp` folder to the repository root.
+3. Open the repository's **Actions** tab and select **Build Android APK**.
+4. Choose **Run workflow**. A build also starts automatically after the first upload.
+5. Open the completed build, then download the `SoilResistivity-APK` artifact.
+6. Extract that artifact ZIP to obtain `app-debug.apk`.
 
 ## Important scientific note
 
