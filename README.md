@@ -1,4 +1,7 @@
+[README.md](https://github.com/user-attachments/files/32548681/README.md)
 # Soil Resistivity Android App
+
+The app opens with a two-second animated splash screen showing the app icon and title.
 
 An offline Android application for entering Wenner (alpha) field measurements and calculating apparent resistivity.
 
