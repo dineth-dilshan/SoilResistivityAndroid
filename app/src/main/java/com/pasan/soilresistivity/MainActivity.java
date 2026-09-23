@@ -102,12 +102,46 @@ public class MainActivity extends Activity {
     private void confirmClear(){new AlertDialog.Builder(this).setTitle("Clear current survey?").setMessage("Saved surveys in History will not be removed.").setNegativeButton("Cancel",null).setPositiveButton("Clear",(d,w)->{points.clear();model=null;editingIndex=-1;historyId=null;projectName.setText("");addButton.setText("Add reading");clearInputs();refresh();saveDraft();focusMn();}).show();}
 
     private void runInversion(){try{model=LayerInverter.fit(points,layerCount.getSelectedItemPosition()+2);refresh();saveDraft();toast("Layer fit completed");}catch(Exception e){toast(e.getMessage());}}
-    private void refreshLayers(){if(layerRows==null||errorText==null)return;layerRows.removeAllViews();if(model==null){errorText.setText("Black: measured   Red: fitted   Blue: layer model");return;}errorText.setText("Fit error: "+number.format(model.errorPercent)+"%   •   preliminary field model");layerRows.addView(text("Layer     ρ (Ωm)       h (m)       depth (m)",14,Color.BLACK));double depth=0;for(int i=0;i<model.resistivity.length;i++){String h=i<model.thickness.length?number.format(model.thickness[i]):"∞";String d=i<model.thickness.length?number.format(depth+=model.thickness[i]):"—";layerRows.addView(text((i+1)+"             "+number.format(model.resistivity[i])+"          "+h+"          "+d,14,Color.DKGRAY));}}
+    private void refreshLayers(){
+        if(layerRows==null||errorText==null)return;
+        layerRows.removeAllViews();
+        if(model==null){errorText.setText("Black: measured   Red: fitted   Blue: layer model");return;}
+        errorText.setText("Fit error: "+number.format(model.errorPercent)+"%   •   preliminary field model");
+        layerRows.addView(layerResultRow("Layer","ρ (Ωm)","h (m)","Depth (m)",true,0));
+        double depth=0;
+        for(int i=0;i<model.resistivity.length;i++){
+            String h=i<model.thickness.length?number.format(model.thickness[i]):"∞";
+            String d=i<model.thickness.length?number.format(depth+=model.thickness[i]):"—";
+            layerRows.addView(layerResultRow(String.valueOf(i+1),number.format(model.resistivity[i]),h,d,false,i));
+        }
+    }
+
+    private LinearLayout layerResultRow(String layer,String rho,String h,String depth,boolean header,int index){
+        LinearLayout row=new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(4),dp(3),dp(4),dp(3));
+        if(!header&&index%2==1)row.setBackgroundColor(Color.rgb(235,247,240));
+        row.addView(layerCell(layer,header,Gravity.START),new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,0.65f));
+        row.addView(layerCell(rho,header,Gravity.END),new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1.35f));
+        row.addView(layerCell(h,header,Gravity.END),new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1.0f));
+        row.addView(layerCell(depth,header,Gravity.END),new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1.15f));
+        return row;
+    }
+
+    private TextView layerCell(String value,boolean header,int gravity){
+        TextView cell=text(value,14,header?Color.BLACK:Color.DKGRAY);
+        cell.setGravity(gravity);
+        cell.setSingleLine(true);
+        cell.setPadding(dp(4),dp(7),dp(4),dp(7));
+        if(header)cell.setTypeface(null,1);
+        return cell;
+    }
 
     private SharedPreferences prefs(){return getSharedPreferences(PREFS,MODE_PRIVATE);}
     private JSONArray pointsJson() throws Exception{JSONArray a=new JSONArray();for(SurveyPoint p:points)a.put(p.toJson());return a;}
     private JSONObject modelJson() throws Exception{return new JSONObject().put("rho",doubleArray(model.resistivity)).put("h",doubleArray(model.thickness)).put("calculated",doubleArray(model.calculated)).put("error",model.errorPercent);}
-   private JSONArray doubleArray(double[] values) throws Exception{JSONArray a=new JSONArray();for(double v:values)a.put(v);return a;}
+    private JSONArray doubleArray(double[] values) throws Exception{JSONArray a=new JSONArray();for(double v:values)a.put(v);return a;}
     private double[] readDoubleArray(JSONArray a)throws Exception{double[] values=new double[a.length()];for(int i=0;i<a.length();i++)values[i]=a.getDouble(i);return values;}
 
     private void saveDraft(){try{prefs().edit().putString("draft_name",projectName==null?"":projectName.getText().toString()).putString("draft_points",pointsJson().toString()).putString("draft_model",model==null?"":modelJson().toString()).putInt("draft_layers",layerCount==null?3:layerCount.getSelectedItemPosition()+2).putString("draft_history_id",historyId==null?"":historyId).apply();}catch(Exception ignored){}}
