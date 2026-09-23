@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
     private SharedPreferences prefs(){return getSharedPreferences(PREFS,MODE_PRIVATE);}
     private JSONArray pointsJson() throws Exception{JSONArray a=new JSONArray();for(SurveyPoint p:points)a.put(p.toJson());return a;}
     private JSONObject modelJson() throws Exception{return new JSONObject().put("rho",doubleArray(model.resistivity)).put("h",doubleArray(model.thickness)).put("calculated",doubleArray(model.calculated)).put("error",model.errorPercent);}
-    private JSONArray doubleArray(double[] values){JSONArray a=new JSONArray();for(double v:values)a.put(v);return a;}
+   private JSONArray doubleArray(double[] values) throws Exception{JSONArray a=new JSONArray();for(double v:values)a.put(v);return a;}
     private double[] readDoubleArray(JSONArray a)throws Exception{double[] values=new double[a.length()];for(int i=0;i<a.length();i++)values[i]=a.getDouble(i);return values;}
 
     private void saveDraft(){try{prefs().edit().putString("draft_name",projectName==null?"":projectName.getText().toString()).putString("draft_points",pointsJson().toString()).putString("draft_model",model==null?"":modelJson().toString()).putInt("draft_layers",layerCount==null?3:layerCount.getSelectedItemPosition()+2).putString("draft_history_id",historyId==null?"":historyId).apply();}catch(Exception ignored){}}
