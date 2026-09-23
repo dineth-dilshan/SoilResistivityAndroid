@@ -1,4 +1,4 @@
-# Soil Resistivity Android App — update 1.3
+# Soil Resistivity Android App — update 1.4
 
 The app opens with a two-second animated splash screen showing the app icon and title.
 
@@ -10,6 +10,8 @@ An offline Android application for plotting and fitting Wenner-alpha VES apparen
 - Correct direct apparent-resistivity handling (no incorrect second `K × R` conversion)
 - Physical layered-earth forward response using the Koefoed resistivity transform and Wenner potential integral
 - Damped, robust 2–5 layer inversion in logarithmic model space
+- Full-decade IPI2Win-style graph limits and a visible engine-version label
+- Automatic invalidation of models previously saved by the obsolete sigmoid fitter
 - Black measured points, red fitted curve, and blue layer step model
 - Layer `ρ`, thickness `h`, cumulative depth `d`, altitude `Alt = -d`, and fit error
 - Save and reopen the most recent survey on the phone
@@ -58,4 +60,4 @@ The workflow caches one debug signing key and uses an increasing GitHub run numb
 
 ## Important scientific note
 
-The graph and array axis follow the supplied IPI2Win Wenner screenshots. Update 1.3 replaces the old sigmoid curve approximation with a physical layered-earth calculation. It remains an independent implementation, not IPI2Win's private filters or least-layer engine. Equivalent layered-earth models can fit the same VES curve, so `ρ` and `h` can differ from IPI2Win even when the calculated curve is a good fit. Confirm interpretations with qualified geophysical analysis before engineering, drilling, construction, or safety decisions.
+The graph and array axis follow the supplied IPI2Win Wenner screenshots. Update 1.4 uses a physical layered-earth calculation and discards results cached by the old sigmoid engine. It remains an independent implementation, not IPI2Win's private filters or least-layer engine. Equivalent layered-earth models can fit the same VES curve, so `ρ` and `h` can differ from IPI2Win even when the calculated curve is a good fit. Confirm interpretations with qualified geophysical analysis before engineering, drilling, construction, or safety decisions.

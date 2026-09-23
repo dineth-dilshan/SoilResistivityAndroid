@@ -33,7 +33,15 @@ public class ResistivityGraphView extends View {
         paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2);paint.setColor(Color.DKGRAY);canvas.drawRect(plot,paint);paint.setStyle(Paint.Style.FILL);paint.setTextSize(22);canvas.drawText(arrayType.axisLabel,(left+right)/2-95,getHeight()-18,paint);canvas.save();canvas.rotate(-90,22,(top+bottom)/2);canvas.drawText("Apparent resistivity (Ωm)",22,(top+bottom)/2,paint);canvas.restore();
         if(points.isEmpty()){paint.setColor(Color.GRAY);canvas.drawText("Add readings to create the graph",left+35,(top+bottom)/2,paint);return;}
         double minX=points.stream().mapToDouble(this::spacing).min().orElse(.1),maxX=points.stream().mapToDouble(this::spacing).max().orElse(10),minY=points.stream().mapToDouble(SurveyPoint::apparentResistivity).min().orElse(1),maxY=points.stream().mapToDouble(SurveyPoint::apparentResistivity).max().orElse(100);
-        if(model!=null)for(double v:model.resistivity){minY=Math.min(minY,v);maxY=Math.max(maxY,v);}minX=Math.max(minX*.8,.0001);maxX*=1.25;minY=Math.max(minY*.7,.0001);maxY*=1.4;double lx0=Math.log10(minX),lx1=Math.log10(maxX),ly0=Math.log10(minY),ly1=Math.log10(maxY);
+        if(model!=null)for(double v:model.resistivity){minY=Math.min(minY,v);maxY=Math.max(maxY,v);}
+        // IPI2Win-style complete logarithmic decades. For the reference data
+        // this produces X=0.1..10 and Y=1..100 instead of cropping the curve.
+        minX=Math.pow(10,Math.floor(Math.log10(minX)));
+        maxX=Math.pow(10,Math.ceil(Math.log10(maxX)));
+        minY=Math.pow(10,Math.floor(Math.log10(minY)));
+        maxY=Math.pow(10,Math.ceil(Math.log10(maxY)));
+        if(maxX<=minX)maxX=minX*10;if(maxY<=minY)maxY=minY*10;
+        double lx0=Math.log10(minX),lx1=Math.log10(maxX),ly0=Math.log10(minY),ly1=Math.log10(maxY);
         paint.setTextSize(15);paint.setStrokeWidth(1);
         for(int decade=(int)Math.ceil(lx0);decade<=Math.floor(lx1);decade++){double value=Math.pow(10,decade);float gx=x(value,lx0,lx1,plot);paint.setColor(Color.LTGRAY);canvas.drawLine(gx,top,gx,bottom,paint);paint.setColor(Color.DKGRAY);canvas.drawText(formatTick(value),gx-10,bottom+20,paint);}
         for(int decade=(int)Math.ceil(ly0);decade<=Math.floor(ly1);decade++){double value=Math.pow(10,decade);float gy=y(value,ly0,ly1,plot);paint.setColor(Color.LTGRAY);canvas.drawLine(left,gy,right,gy,paint);paint.setColor(Color.DKGRAY);canvas.drawText(formatTick(value),left-52,gy+5,paint);}

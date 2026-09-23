@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
+    private static final String ENGINE_VERSION="physical-wenner-1.4";
     private static final int CREATE_PDF=40, CREATE_CSV=41, OPEN_HISTORY=42;
     private static final String PREFS="soil_resistivity_data";
     private final List<SurveyPoint> points=new ArrayList<>();
@@ -57,6 +58,7 @@ public class MainActivity extends Activity {
     private View buildScreen(){
         ScrollView scroll=new ScrollView(this);LinearLayout root=column();root.setPadding(dp(16),dp(16),dp(16),dp(30));scroll.addView(root);
         TextView title=text("Soil Resistivity Survey",26,Color.rgb(11,74,45));title.setTypeface(null,1);root.addView(title);
+        root.addView(text("App 1.4 • Physical Wenner engine",13,Color.DKGRAY));
         arrayTypeSpinner=new Spinner(this);arrayTypeSpinner.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,new String[]{"Wenner (alpha) — offline 1-D inversion"}));root.addView(arrayTypeSpinner,matchWrap());
         projectName=input("Survey name",false);root.addView(projectName,matchWrap());
         root.addView(text("Enter a measurement",20,Color.rgb(11,74,45)));
@@ -159,8 +161,8 @@ public class MainActivity extends Activity {
     private JSONArray doubleArray(double[] values) throws Exception{JSONArray a=new JSONArray();for(double v:values)a.put(v);return a;}
     private double[] readDoubleArray(JSONArray a)throws Exception{double[] values=new double[a.length()];for(int i=0;i<a.length();i++)values[i]=a.getDouble(i);return values;}
 
-    private void saveDraft(){try{prefs().edit().putString("draft_name",projectName==null?"":projectName.getText().toString()).putString("draft_points",pointsJson().toString()).putString("draft_model",model==null?"":modelJson().toString()).putInt("draft_layers",layerCount==null?3:layerCount.getSelectedItemPosition()+2).putInt("draft_array",0).putString("draft_history_id",historyId==null?"":historyId).apply();}catch(Exception ignored){}}
-    private void loadDraft(){try{arrayTypeSpinner.setSelection(0);updateMethodInputs();projectName.setText(prefs().getString("draft_name",""));points.clear();JSONArray a=new JSONArray(prefs().getString("draft_points","[]"));for(int i=0;i<a.length();i++)points.add(SurveyPoint.fromJson(a.getJSONObject(i)));String m=prefs().getString("draft_model","");model=m.isEmpty()?null:readModel(new JSONObject(m));int layers=prefs().getInt("draft_layers",3);layerCount.setSelection(Math.max(0,Math.min(3,layers-2)));String id=prefs().getString("draft_history_id","");historyId=id.isEmpty()?null:id;refresh();}catch(Exception e){points.clear();model=null;refresh();}}
+    private void saveDraft(){try{prefs().edit().putString("draft_name",projectName==null?"":projectName.getText().toString()).putString("draft_points",pointsJson().toString()).putString("draft_model",model==null?"":modelJson().toString()).putInt("draft_layers",layerCount==null?3:layerCount.getSelectedItemPosition()+2).putInt("draft_array",0).putString("draft_history_id",historyId==null?"":historyId).putString("draft_engine",ENGINE_VERSION).apply();}catch(Exception ignored){}}
+    private void loadDraft(){try{arrayTypeSpinner.setSelection(0);updateMethodInputs();projectName.setText(prefs().getString("draft_name",""));points.clear();JSONArray a=new JSONArray(prefs().getString("draft_points","[]"));for(int i=0;i<a.length();i++)points.add(SurveyPoint.fromJson(a.getJSONObject(i)));String m=prefs().getString("draft_model","");boolean currentEngine=ENGINE_VERSION.equals(prefs().getString("draft_engine",""));model=!currentEngine||m.isEmpty()?null:readModel(new JSONObject(m));int layers=prefs().getInt("draft_layers",3);layerCount.setSelection(Math.max(0,Math.min(3,layers-2)));String id=prefs().getString("draft_history_id","");historyId=id.isEmpty()?null:id;refresh();}catch(Exception e){points.clear();model=null;refresh();}}
     private LayerModel readModel(JSONObject o)throws Exception{return new LayerModel(readDoubleArray(o.getJSONArray("rho")),readDoubleArray(o.getJSONArray("h")),readDoubleArray(o.getJSONArray("calculated")),o.getDouble("error"));}
 
     private void saveToHistory(){
