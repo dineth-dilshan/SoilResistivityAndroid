@@ -21,9 +21,8 @@ public final class SurveyPoint {
         return Math.PI * (abHalf * abHalf - mnHalf * mnHalf) / (2.0 * mnHalf);
     }
 
-    public double apparentResistivity() {
-        return geometricFactor() * resistance;
-    }
+    /** The imported/entered third column is apparent resistivity, not resistance. */
+    public double apparentResistivity() { return resistance; }
 
     public double wennerSpacing() { return (2.0 * abHalf) / 3.0; }
 

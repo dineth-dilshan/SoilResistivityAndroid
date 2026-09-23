@@ -10,7 +10,7 @@ android {
         targetSdk 35
         def cloudBuild = System.getenv('GITHUB_RUN_NUMBER') ?: '1'
         versionCode cloudBuild.toInteger()
-        versionName "1.1.${cloudBuild}"
+        versionName "1.3.${cloudBuild}"
     }
 
     buildTypes {

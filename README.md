@@ -1,34 +1,27 @@
-[README.md](https://github.com/user-attachments/files/32548681/README.md)
-# Soil Resistivity Android App
+# Soil Resistivity Android App — update 1.3
 
 The app opens with a two-second animated splash screen showing the app icon and title.
 
-An offline Android application for entering Wenner (alpha) field measurements and calculating apparent resistivity.
+An offline Android application for plotting and fitting Wenner-alpha VES apparent-resistivity measurements.
 
 ## Features
 
-- Manual `MN/2`, `AB/2`, and resistance entry
-- Automatic geometric factor and apparent-resistivity calculation
-- Logarithmic resistivity graph using the correct Wenner `AB/3` spacing axis
-- Selectable 2–5 layer automatic curve fit
+- Wenner-only input: `a` and direct `ρa`; graph X-axis `a = AB/3`
+- Correct direct apparent-resistivity handling (no incorrect second `K × R` conversion)
+- Physical layered-earth forward response using the Koefoed resistivity transform and Wenner potential integral
+- Damped, robust 2–5 layer inversion in logarithmic model space
 - Black measured points, red fitted curve, and blue layer step model
-- Layer resistivity, thickness, cumulative depth, and fit error
+- Layer `ρ`, thickness `h`, cumulative depth `d`, altitude `Alt = -d`, and fit error
 - Save and reopen the most recent survey on the phone
 - Automatic draft recovery after pressing Home or after Android closes the app
-- Tap any reading row to edit it, then return automatically to `MN/2`
+- Tap any reading row to edit it, then return automatically to the `a` input
 - Survey History with reopen, edit, export, and delete functions
 - Built-in sample dataset from the supplied field sheet
 - PDF report export
 - Excel-compatible CSV export
 - No internet permission and no third-party runtime libraries
 
-## Calculation
-
-`K = π × ((AB/2)² − (MN/2)²) ÷ (2 × MN/2)`
-
-`ρa = K × R`
-
-Distances are entered in metres and resistance in ohms, producing apparent resistivity in ohm-metres.
+The supplied third measurement is already apparent resistivity `ρa` in Ωm. Ground level is `0 m`; depth increases downward and altitude is negative below ground. The final half-space shows `h = ∞`, `d = —`, and `Alt = —`.
 
 ## Build in Android Studio
 
@@ -58,11 +51,11 @@ The workflow caches one debug signing key and uses an increasing GitHub run numb
 
 1. Create a new GitHub repository and keep it private.
 2. Upload the **contents** of this `SoilResistivityApp` folder to the repository root.
-3. Open the repository's **Actions** tab and select **Build Android APK**.
+3. Open the repository's **Actions** tab and select **Build Android APK**. Pushes from `update-1.2` and other branches are supported.
 4. Choose **Run workflow**. A build also starts automatically after the first upload.
 5. Open the completed build, then download the `SoilResistivity-APK` artifact.
 6. Extract that artifact ZIP to obtain `app-debug.apk`.
 
 ## Important scientific note
 
-The automatic layer model is a fast smooth curve-fitting estimate for preliminary field screening. It is not a reproduction of IPI2Win's proprietary inversion engine. Confirm layer interpretations with qualified geophysical analysis before engineering, drilling, construction, or safety decisions.
+The graph and array axis follow the supplied IPI2Win Wenner screenshots. Update 1.3 replaces the old sigmoid curve approximation with a physical layered-earth calculation. It remains an independent implementation, not IPI2Win's private filters or least-layer engine. Equivalent layered-earth models can fit the same VES curve, so `ρ` and `h` can differ from IPI2Win even when the calculated curve is a good fit. Confirm interpretations with qualified geophysical analysis before engineering, drilling, construction, or safety decisions.

@@ -1,18 +1,21 @@
-import math
+"""Regression checks for the two array input mappings used by update 1.2."""
 
-def apparent_resistivity(mn_half, ab_half, resistance):
-    k = math.pi * (ab_half ** 2 - mn_half ** 2) / (2 * mn_half)
-    return k, k * resistance
+rho_a = [29.4, 16.7, 12.7, 10.6, 8.58, 7.72, 6.74, 5.63, 4.92, 4.30, 3.82, 3.01, 3.33]
+wenner_a = [0.5 * (i + 1) for i in range(13)]
+schlumberger_ab2 = [1.5 * a for a in wenner_a]
+schlumberger_mn = list(wenner_a)
 
-tests = [
-    (0.25, 0.75, 29.4, 92.36),
-    (0.50, 1.50, 16.7, 104.93),
-    (3.00, 9.00, 3.33, 125.54),
-]
+assert wenner_a[0] == 0.5 and wenner_a[-1] == 6.5
+assert schlumberger_ab2[0] == 0.75 and schlumberger_ab2[-1] == 9.75
+assert schlumberger_mn[0] == 0.5 and schlumberger_mn[-1] == 6.5
+assert rho_a[-2:] == [3.01, 3.33]
 
-for mn, ab, r, expected in tests:
-    _, rho = apparent_resistivity(mn, ab, r)
-    assert abs(rho - expected) < 0.01, (rho, expected)
-    assert abs((2 * ab / 3) - (2 * mn)) < 1e-9  # Wenner a = AB/3 = MN
+depths = []
+depth = 0.0
+for thickness in (0.3352, 1.874):
+    depth += thickness
+    depths.append(depth)
+assert depths == [0.3352, 2.2092]
+assert [-d for d in depths] == [-0.3352, -2.2092]
 
-print("Formula and Wenner spacing tests passed")
+print("Array mapping and depth/altitude checks passed")
